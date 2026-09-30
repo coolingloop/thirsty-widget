@@ -42,6 +42,7 @@ async function until(what, fn, ms) {
   throw new Error(`Timed out waiting for ${what} (last: ${JSON.stringify(last)})`);
 }
 const sipsToday = (s) => s.today?.sips ?? s.today?.count;
+const expected = process.platform === 'win32' ? 5 : 6;
 
 (async () => {
   if (!fs.existsSync(exe)) throw new Error('Executable not found: ' + exe);
@@ -69,15 +70,24 @@ const sipsToday = (s) => s.today?.sips ?? s.today?.count;
     pass('foreign web origin refused', '403');
     if (!fs.existsSync(path.join(dirs.data, 'port'))) throw new Error('port file missing');
     pass('data folder written', dirs.data);
+    // On the Mac and Linux a SIGTERM must close the app within 5 s: the real quit path.
+    if (process.platform !== 'win32') {
+      child.kill('SIGTERM');
+      await until('quit on SIGTERM', async () => exited, 5000);
+      pass('quits cleanly on SIGTERM', JSON.stringify(exited));
+    }
   } finally {
     if (!exited) {
       if (process.platform === 'win32') { try { execFileSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }); } catch {} }
-      else child.kill('SIGTERM');
+      else child.kill('SIGKILL');
       await sleep(1500);
     }
+    // Helper processes can hold the pipes open; they must never keep this script alive.
+    child.stdout.destroy();
+    child.stderr.destroy();
     if (process.env.SMOKE_KEEP !== '1') fs.rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 });
-    const failed = results.length < 5;
-    if (failed) console.log('--- app output ---\n' + log.slice(-4000));
+    if (results.length < expected) console.log('--- app output ---\n' + log.slice(-4000));
   }
-  console.log(`SMOKE OK: ${results.length}/5`);
+  console.log(`SMOKE OK: ${results.length}/${expected}`);
+  process.exit(0);
 })().catch((e) => { console.error('SMOKE FAIL:', e.message); process.exit(1); });

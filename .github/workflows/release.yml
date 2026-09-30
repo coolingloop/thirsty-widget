@@ -29,8 +29,10 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - name: Smoke test the unpacked app
+        timeout-minutes: 10
         run: node test/smoke-packaged.js dist/win-unpacked/THIRSTY.exe
       - name: Install, run, uninstall (clean runner profile)
+        timeout-minutes: 10
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -48,6 +50,7 @@ jobs:
           if (Test-Path $lnk) { throw 'uninstall left the shortcut behind' }
           Write-Output 'install, run and uninstall OK'
       - name: Smoke test the portable exe
+        timeout-minutes: 10
         continue-on-error: true
         run: node test/smoke-packaged.js dist/THIRSTY-Portable.exe
       - uses: actions/upload-artifact@v4
@@ -81,6 +84,7 @@ jobs:
           codesign --verify --deep --strict --verbose=2 dist/mac/THIRSTY.app
           codesign -dv dist/mac-arm64/THIRSTY.app 2>&1 | grep -E 'Signature=adhoc|flags'
       - name: Smoke test the Apple Silicon app from the dmg
+        timeout-minutes: 10
         run: |
           set -e
           mnt=$(mktemp -d)
@@ -91,6 +95,7 @@ jobs:
           hdiutil detach "$mnt"
           node test/smoke-packaged.js "$RUNNER_TEMP/THIRSTY.app/Contents/MacOS/THIRSTY"
       - name: Smoke test the Intel app under Rosetta
+        timeout-minutes: 10
         continue-on-error: true
         run: |
           if arch -x86_64 /usr/bin/true 2>/dev/null; then

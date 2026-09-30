@@ -41,6 +41,9 @@ app.whenReady().then(async()=>{
  let lastDay=day();setInterval(()=>{if(store){if(day()!==lastDay){lastDay=day();store.checkBadges();store.save();}emit('stats',store.snapshot());}},60000).unref();
 }).catch(e=>{console.error(e.stack);app.exit(1);});
 app.on('window-all-closed',()=>{});
-app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;(async()=>{await collectors?.stop();store?.save();await api?.close();tray?.destroy();app.quit();})().catch(()=>app.exit(1));});
+// A quit signal from the system (SIGTERM on the Mac and Linux) quits like the tray menu does, and a
+// cleanup that stalls can never keep the app alive: after 3 s it exits anyway.
+process.on('SIGTERM',()=>app.quit());
+app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;setTimeout(()=>app.exit(0),3000).unref();(async()=>{await collectors?.stop();store?.save();await api?.close();tray?.destroy();app.quit();})().catch(()=>app.exit(1));});
 // Test automation uses Electron's own API through Playwright, never an exposed HTTP control port.
 module.exports={get widget(){return widget;},get dashboard(){return dashboard;},get store(){return store;},get collectors(){return collectors;},openDashboard};
