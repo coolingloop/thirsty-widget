@@ -1,0 +1,3 @@
+'use strict';
+async function refresh(){const {queue=[]}=await chrome.storage.local.get('queue');try{const r=await chrome.runtime.sendMessage({type:'stats'});if(!r.connected)throw new Error('offline');const sips=Object.entries(r.stats.bySource).filter(([s])=>s.startsWith('web:')).reduce((n,[,v])=>n+v.sips,0);document.getElementById('sips').textContent=sips;document.getElementById('water').textContent=(sips*3.5).toFixed(1)+' mL';document.getElementById('status').textContent='Desktop pet connected.';}catch{document.getElementById('status').textContent='Desktop pet offline. '+queue.length+' prompts queued.';}}
+document.getElementById('dashboard').addEventListener('click',()=>chrome.runtime.sendMessage({type:'dashboard'}));document.fonts.ready.then(refresh);

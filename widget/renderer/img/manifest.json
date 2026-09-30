@@ -1,0 +1,126 @@
+{
+  "thirsty-sip": {
+    "width": 542,
+    "height": 597
+  },
+  "thirsty-suck": {
+    "width": 586,
+    "height": 598
+  },
+  "thirsty-shock": {
+    "width": 552,
+    "height": 606
+  },
+  "thirsty-burp": {
+    "width": 631,
+    "height": 606
+  },
+  "badge-01": {
+    "width": 312,
+    "height": 317
+  },
+  "badge-02": {
+    "width": 310,
+    "height": 318
+  },
+  "badge-03": {
+    "width": 309,
+    "height": 320
+  },
+  "badge-04": {
+    "width": 312,
+    "height": 321
+  },
+  "badge-05": {
+    "width": 312,
+    "height": 326
+  },
+  "badge-06": {
+    "width": 310,
+    "height": 327
+  },
+  "badge-07": {
+    "width": 309,
+    "height": 326
+  },
+  "badge-08": {
+    "width": 313,
+    "height": 327
+  },
+  "badge-09": {
+    "width": 312,
+    "height": 333
+  },
+  "badge-10": {
+    "width": 310,
+    "height": 334
+  },
+  "badge-11": {
+    "width": 309,
+    "height": 334
+  },
+  "badge-12": {
+    "width": 313,
+    "height": 334
+  },
+  "planet-parched": {
+    "width": 420,
+    "height": 411
+  },
+  "planet-okay": {
+    "width": 420,
+    "height": 411
+  },
+  "planet-lush": {
+    "width": 420,
+    "height": 410
+  },
+  "sticker-01-shrug": {
+    "width": 635,
+    "height": 650
+  },
+  "sticker-02-cheers": {
+    "width": 594,
+    "height": 650
+  },
+  "sticker-03-cry": {
+    "width": 470,
+    "height": 650
+  },
+  "sticker-04-laugh": {
+    "width": 523,
+    "height": 650
+  },
+  "sticker-05-angry": {
+    "width": 640,
+    "height": 650
+  },
+  "sticker-06-love": {
+    "width": 470,
+    "height": 650
+  },
+  "sticker-07-sleep": {
+    "width": 470,
+    "height": 650
+  },
+  "sticker-08-think": {
+    "width": 469,
+    "height": 650
+  },
+  "sticker-09-sweat-drop": {
+    "width": 469,
+    "height": 650
+  },
+  "sticker-10-thumbs-up": {
+    "width": 535,
+    "height": 650
+  },
+  "sticker-11-dead-x": {
+    "width": 650,
+    "height": 532
+  },
+  "sticker-12-wave": {
+    "width": 525,
+    "height": 650
+  }
+}

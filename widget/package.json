@@ -1,0 +1,125 @@
+{
+  "name": "thirsty",
+  "productName": "THIRSTY",
+  "version": "1.0.0",
+  "description": "A cartoon desktop pet that takes a sip every time an AI answers you",
+  "main": "main.js",
+  "homepage": "https://github.com/coolingloop/thirsty-widget",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "verify": "node test/acceptance.js",
+    "icons": "python tools/icons.py",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never",
+    "smoke": "node test/smoke-packaged.js"
+  },
+  "keywords": [],
+  "author": "Cooling Loop",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3",
+    "playwright": "1.63.0"
+  },
+  "build": {
+    "appId": "app.thirsty.widget",
+    "productName": "THIRSTY",
+    "copyright": "Cooling Loop",
+    "electronVersion": "44.5.1",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "engine/**",
+      "renderer/**"
+    ],
+    "asarUnpack": [
+      "engine/**"
+    ],
+    "electronLanguages": [
+      "en-US"
+    ],
+    "compression": "maximum",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": true,
+      "shortcutName": "THIRSTY",
+      "uninstallDisplayName": "THIRSTY",
+      "include": "build/installer.nsh",
+      "artifactName": "THIRSTY-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "THIRSTY-Portable.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.lifestyle",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "extendInfo": {
+        "LSUIElement": true
+      },
+      "artifactName": "THIRSTY-mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "THIRSTY",
+      "artifactName": "THIRSTY-mac-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "Utility",
+      "artifactName": "THIRSTY-linux-${arch}.${ext}"
+    }
+  }
+}

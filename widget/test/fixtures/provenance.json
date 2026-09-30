@@ -1,0 +1,14 @@
+[
+  {
+    "fixture": "claude-stream.jsonl",
+    "fileHash": "be0c38a3fcb8de32656359db48a3174ed389f1c937ca0a2759f3c6dbf7eeb497",
+    "messageId": "msg_011CfZXZ2tF1nGsrRkpMsg1e"
+  },
+  {
+    "fixture": "codex.jsonl",
+    "fileHash": "5527e918ba79ff066eb07115b5eafc2c30a41d5821d9ceaad826999b91fe7369"
+  },
+  {
+    "note": "Duplicate variant of a real token_count entry"
+  }
+]

@@ -1,0 +1,142 @@
+name: release
+
+# Push a tag like v1.0.1 to build, test and publish a release.
+# Run it by hand (Actions tab) to build and test without publishing.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: widget
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: widget/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx electron-builder --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Smoke test the unpacked app
+        run: node test/smoke-packaged.js dist/win-unpacked/THIRSTY.exe
+      - name: Install, run, uninstall (clean runner profile)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $p = Start-Process -FilePath dist/THIRSTY-Setup.exe -ArgumentList '/S' -Wait -PassThru
+          if ($p.ExitCode) { throw "installer exit $($p.ExitCode)" }
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\thirsty'
+          if (-not (Test-Path "$dir\THIRSTY.exe")) { throw "not installed in $dir" }
+          $lnk = Join-Path ([Environment]::GetFolderPath('Programs')) 'THIRSTY.lnk'
+          if (-not (Test-Path $lnk)) { throw 'no Start Menu shortcut' }
+          node test/smoke-packaged.js "$dir\THIRSTY.exe"
+          if ($LASTEXITCODE) { throw 'installed app failed the smoke test' }
+          $p = Start-Process -FilePath "$dir\Uninstall THIRSTY.exe" -ArgumentList '/S' -Wait -PassThru
+          Start-Sleep -Seconds 5
+          if (Test-Path "$dir\THIRSTY.exe") { throw 'uninstall left the app behind' }
+          if (Test-Path $lnk) { throw 'uninstall left the shortcut behind' }
+          Write-Output 'install, run and uninstall OK'
+      - name: Smoke test the portable exe
+        continue-on-error: true
+        run: node test/smoke-packaged.js dist/THIRSTY-Portable.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            widget/dist/THIRSTY-Setup.exe
+            widget/dist/THIRSTY-Portable.exe
+          if-no-files-found: error
+
+  mac:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: widget
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: widget/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx electron-builder --mac --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Check the ad-hoc signatures
+        run: |
+          codesign --verify --deep --strict --verbose=2 dist/mac-arm64/THIRSTY.app
+          codesign --verify --deep --strict --verbose=2 dist/mac/THIRSTY.app
+          codesign -dv dist/mac-arm64/THIRSTY.app 2>&1 | grep -E 'Signature=adhoc|flags'
+      - name: Smoke test the Apple Silicon app from the dmg
+        run: |
+          set -e
+          mnt=$(mktemp -d)
+          hdiutil attach -nobrowse -readonly -mountpoint "$mnt" dist/THIRSTY-mac-arm64.dmg
+          ls "$mnt"
+          test -L "$mnt/Applications"
+          cp -R "$mnt/THIRSTY.app" "$RUNNER_TEMP/THIRSTY.app"
+          hdiutil detach "$mnt"
+          node test/smoke-packaged.js "$RUNNER_TEMP/THIRSTY.app/Contents/MacOS/THIRSTY"
+      - name: Smoke test the Intel app under Rosetta
+        continue-on-error: true
+        run: |
+          if arch -x86_64 /usr/bin/true 2>/dev/null; then
+            SMOKE_PORT=47875 node test/smoke-packaged.js dist/mac/THIRSTY.app/Contents/MacOS/THIRSTY
+          else
+            echo 'Rosetta is not available on this runner; Intel build not launched.'
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: |
+            widget/dist/THIRSTY-mac-arm64.dmg
+            widget/dist/THIRSTY-mac-x64.dmg
+            widget/dist/THIRSTY-mac-arm64.zip
+            widget/dist/THIRSTY-mac-x64.zip
+          if-no-files-found: error
+
+  extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Zip the extension
+        run: python3 tools/pack-extension.py dist/thirsty-extension.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension
+          path: dist/thirsty-extension.zip
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, mac, extension]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Checksums
+        working-directory: out
+        run: sha256sum * | tee SHA256SUMS.txt
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" out/* \
+            --title "THIRSTY $GITHUB_REF_NAME" \
+            --notes-file RELEASE_NOTES.md

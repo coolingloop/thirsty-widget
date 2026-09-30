@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <title>THIRSTY</title>
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="widget.css" />
+    <script defer src="sprites.js"></script>
+    <script defer src="widget.js"></script>
+  </head>
+  <body>
+    <main id="pet" data-mood="chill">
+      <div id="pill" title="0 sips today">
+        <span class="drop"></span><span id="total">0.00 L</span><span id="live-dot"></span>
+      </div>
+      <div id="bubble" role="status"></div>
+
+      <!-- His daily ration is the glass: back half behind him, liquid and front half over his straw. -->
+      <svg id="glass-back" class="glass" viewBox="0 0 104 74" aria-hidden="true">
+        <path class="glass-body" d="M4 6h96l-8 60q-1 5-6 5H18q-5 0-6-5z" />
+      </svg>
+
+      <div id="mound" aria-hidden="true"></div>
+      <div id="body">
+        <img id="mascot" src="img/thirsty-sip.webp" draggable="false" alt="Thirsty" />
+        <i class="steam s1"></i><i class="steam s2"></i>
+        <span id="zzz">Zzz</span>
+      </div>
+      <i id="bead" aria-hidden="true"></i>
+
+      <svg id="glass-front" class="glass" viewBox="0 0 104 74" aria-hidden="true">
+        <defs>
+          <clipPath id="glass-inside"><path d="M4 6h96l-8 60q-1 5-6 5H18q-5 0-6-5z" /></clipPath>
+        </defs>
+        <g clip-path="url(#glass-inside)">
+          <g id="liquid">
+            <path class="liquid-body" d="M-20 8q13-5 26 0t26 0t26 0t26 0t26 0V90H-20z" />
+            <path class="liquid-top" d="M-20 8q13-5 26 0t26 0t26 0t26 0t26 0" />
+          </g>
+        </g>
+        <path class="glass-rim" d="M4 6h96l-8 60q-1 5-6 5H18q-5 0-6-5z" />
+        <path class="glass-shine" d="M14 16l4 42" />
+      </svg>
+
+      <div id="ration" title="Daily ration">
+        <span id="ration-label">RATION</span><span id="ration-amount">0 / 2 L</span>
+      </div>
+      <div id="pop" class="display"></div>
+      <div id="confetti"></div>
+      <div id="loading">WAKING UP...</div>
+    </main>
+  </body>
+</html>
