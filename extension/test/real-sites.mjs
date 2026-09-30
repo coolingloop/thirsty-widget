@@ -31,7 +31,8 @@ const only = process.argv.slice(2);
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'thirsty-ext-'));
 const context = await chromium.launchPersistentContext(profile, {
   channel: 'chromium', headless: true, viewport: {width: 1280, height: 900},
-  args: [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`],
+  // MediaRouter off: its network discovery makes Windows ask to open the firewall for Chrome for Testing.
+  args: [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`, '--disable-features=MediaRouter'],
 });
 const results = [];
 try {

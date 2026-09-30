@@ -67,13 +67,16 @@ yourself (below), or compare the checksums of your download with `SHA256SUMS.txt
 
 ## How the water is counted
 
-One AI reply is one sip, **3.5 mL**. Google measured the median Gemini text prompt at 0.26 mL of
-water on site ([arXiv 2508.15734](https://arxiv.org/abs/2508.15734)). Berkeley Lab's 2024 report
-puts US data centres at 17 billion gallons of direct water in 2023 and 211 billion gallons indirect
-through the electricity they use
-([LBNL](https://eta.lbl.gov/publications/2024-lbnl-data-center-energy-usage-report)), about 13.4
-times the on-site figure. 0.26 x 13.4 = 3.5 mL. It is an estimate and a floor, not a measurement of
-any one reply. Long agent replies with big contexts use more.
+Every reply is weighed by its own tokens. Energy comes from the tokens it reads and writes (fresh
+input, cached input, output and reasoning) and the size of the model; water comes from that energy
+for the cloud that serves it, cooling water on site plus the water power plants evaporate. A short
+chat answer is about 1 mL; a coding-agent turn that re-reads a 300,000-token project can be 50 mL.
+The numbers are anchored on Google's measured 0.24 Wh median Gemini prompt, OpenAI's 0.34 Wh average
+ChatGPT query and Epoch AI's estimates, with per-cloud water factors from Jegham et al. and Berkeley
+Lab. Full method, every number and its source: [WATER-MODEL.md](WATER-MODEL.md).
+
+As lifetime water grows he unlocks milestones, from a glass (0.25 L) through a bathtub (150 L) and
+a fire truck (3,000 L) to an Olympic pool (2.5 million L).
 
 Plain chats in the Claude and ChatGPT desktop apps leave no local log, so they cannot be counted.
 Their Claude Code and Codex sessions are.

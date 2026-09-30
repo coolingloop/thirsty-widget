@@ -28,7 +28,9 @@ at any time.
 On the supported AI chat sites (Claude, ChatGPT, Gemini, Perplexity, Copilot, Grok, DeepSeek,
 Mistral and Google AI Studio) it notices when you send a message. To avoid counting the same
 message twice it makes a short hash of the text in the moment, which is thrown away and never
-saved or sent. What it keeps is a count event: site, time and a random id. It hands those to the
+saved or sent. For the water estimate it measures lengths as character counts (the conversation so
+far, your message and the answer), never the words. What it keeps is a count event: site, time, a
+random id and those three numbers. It hands those to the
 desktop app on `127.0.0.1` and keeps them in Chrome's local extension storage until the app is
 running.
 

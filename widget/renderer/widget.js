@@ -27,6 +27,7 @@ const quips = [
 ];
 let stats,
   pending = 0,
+  pendingMl = 0,
   source = 'codex',
   gulping = false,
   nextGulp = 0,
@@ -158,7 +159,11 @@ function slurp() {
 }
 
 const LIGHT_TEXT = ['#111111', '#10A37F', '#1463FF', '#4285F4', '#4D6BFE', '#7B61FF'];
-function gulp(n, s) {
+// Water per reply now ranges from about 1 mL (a short chat) to litres (a long agent turn).
+function amount(ml) {
+  return ml >= 1000 ? (ml / 1000).toFixed(2) + ' L' : ml >= 10 ? Math.round(ml) + ' mL' : ml.toFixed(1) + ' mL';
+}
+function gulp(n, s, ml) {
   gulping = true;
   pet.dataset.mood = 'sipping';
   show('thirsty-suck');
@@ -167,7 +172,7 @@ function gulp(n, s) {
   void pet.offsetWidth;
   pet.classList.add('gulp');
   const color = stats?.bySource?.[s]?.color || '#2EC4FF';
-  $('pop').textContent = '+' + (n * 3.5).toFixed(1) + ' mL' + (n > 1 ? ' x' + n : '');
+  $('pop').textContent = '+' + amount(ml) + (n > 1 ? ' x' + n : '');
   $('pop').style.background = color;
   $('pop').style.color = LIGHT_TEXT.includes(color) ? '#FFF3D6' : '#111111';
   $('pop').classList.add('show');
@@ -180,19 +185,23 @@ function gulp(n, s) {
   }, 600);
 }
 // Agent loops emit several replies a second: at most three gulps a second, the rest
-// are counted into the next pop ("+17.5 mL x5").
+// are counted into the next pop ("+64 mL x5").
 function flush() {
   if (!pending || gulping) return;
   const delay = Math.max(0, nextGulp - Date.now());
   setTimeout(() => {
     if (gulping || !pending) return;
-    const n = pending;
+    const n = pending, ml = pendingMl;
     pending = 0;
+    pendingMl = 0;
     nextGulp = Date.now() + 334;
-    gulp(n, source);
+    gulp(n, source, ml);
   }, delay);
 }
 function sip(e) {
+  // A streamed reply keeps growing after its first sip: its extra water joins the next pop.
+  pendingMl += e.ml || 0;
+  if (!e.sips) return;
   if (pet.dataset.mood === 'sleeping') {
     show('sticker-12-wave');
     pet.classList.add('wake');
@@ -210,7 +219,14 @@ function sip(e) {
 }
 function badge(e) {
   bubble('UNLOCKED: ' + e.name, 4200);
-  for (let i = 0; i < 20; i++) {
+  confetti(20);
+}
+function milestone(e) {
+  bubble(`${e.name}! Your AI has drunk ${amount(e.litres * 1000)} of water so far.`, 6000);
+  confetti(36);
+}
+function confetti(count) {
+  for (let i = 0; i < count; i++) {
     const c = document.createElement('i');
     c.style.cssText = `--x:${Math.cos(i) * 100}px;--y:${50 + Math.sin(i) * 90}px;--r:${i * 87}deg;background:${['#FFD12E', '#35D07F', '#2EC4FF', '#FF4A3D'][i % 4]}`;
     $('confetti').append(c);
@@ -265,6 +281,7 @@ addEventListener('contextmenu', (e) => {
 window.thirsty.on('stats', draw);
 window.thirsty.on('sip', sip);
 window.thirsty.on('badge', badge);
+window.thirsty.on('milestone', milestone);
 window.thirsty.on('toast', (text) => bubble(text, 6000));
 window.thirsty.on('progress', (p) => {
   $('loading').textContent = `WAKING UP... ${p.done} / ${p.total}`;

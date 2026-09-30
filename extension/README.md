@@ -20,8 +20,12 @@ user-message node that contains what was in the composer. Sites decorate that no
 screen-reader copies), so the extension hashes a 48-character sample of the composer text and looks
 for the same hash anywhere in the node's text. The first 2 s after a page load or a chat switch are
 ignored, and two or more new user nodes at once are treated as history loading, so reopening a chat
-never counts. Only hashes are held, for at most 10 s; the text is never stored or sent. Each
-confirmed prompt adds one prompt and one sip (3.5 mL).
+never counts. Only hashes are held, for at most 10 s; the text is never stored or sent.
+
+For the water estimate it also measures sizes, as character counts: the conversation before your
+message, your message, and how much the page grows while the answer streams. When the page has
+been still for 4 s the answer is done, and one prompt and one sip go to the desktop app with those
+sizes divided by 4 as token estimates.
 
 `test/real-sites.mjs` loads the extension into Playwright's Chromium and checks every site live.
 Logged out and automated, several sites stop at a bot check or a login page, which the script

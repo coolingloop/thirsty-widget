@@ -18,7 +18,10 @@ async function startAPI(getStore,dataDir,{port=47821,openDashboard=()=>{},progre
    store.state.extensionLastSeen=Date.now();store.dirty=true;store.scheduleSave();
    if(url.pathname==='/dashboard'){openDashboard();return send(200,{ok:true});}
    let body='';try{for await(const chunk of req){body+=chunk;if(body.length>8192)return send(413,{error:'Body too large'});}const e=JSON.parse(body);const source='web:'+e.site;if(e.source!=='web' && e.source!==source || !SOURCES[source] || !['prompt','sip'].includes(e.kind) || typeof e.id!=='string' || e.id.length>200 || !Number.isFinite(Date.parse(e.ts)))return send(400,{error:'Invalid event'});
-    const accepted=store.add({...e,source,id:'web:'+e.id});return send(200,{ok:true,deduped:!accepted});
+    // Token estimates from the extension (message lengths / 4). Missing reply length = a typical 500-token answer.
+    const n=k=>Math.min(5e6,Math.max(0,Math.round(Number(e[k])||0))),measured=['tokensIn','tokensContext','tokensOut'].some(k=>e[k]!==undefined);
+    const usage=measured?{input:n('tokensIn'),cacheRead:n('tokensContext'),cacheWrite:0,output:n('tokensOut')||500}:undefined;
+    const accepted=store.add({source,id:'web:'+e.id,kind:e.kind,ts:e.ts,usage,tokens:usage?usage.input+usage.cacheRead+usage.output:0});return send(200,{ok:true,deduped:!accepted});
    }catch{return send(400,{error:'Invalid JSON'});}
   }
   send(404,{error:'Not found'});

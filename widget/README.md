@@ -21,8 +21,9 @@ Mac he has no Dock icon; the Dock icon appears only while the dashboard is open.
 Plain chats in the Claude and ChatGPT desktop apps leave no local log and cannot be counted.
 Tokens are shown on their own and never turned into water.
 
-One reply is one sip of 3.5 mL (see the root README for the sources). After the first scan the
-daily ration is 80% of your median day over the last 14 active days, rounded to 0.5 L (minimum
+Each reply's water comes from its tokens, model and cloud (`engine/water.js`, method in the root
+`WATER-MODEL.md`): about 1 mL for a short chat answer, tens of mL for a long agent turn. Lifetime
+water unlocks 16 milestones from a glass to an Olympic pool. After the first scan the daily ration is 80% of your median day over the last 14 active days, rounded to 0.5 L (minimum
 0.5 L, 2 L with no history); a value you set yourself is never overwritten. Days under ration
 build the streak; the planet goes parched (under 3 days), okay (3 to 13), lush (14 and up).
 
